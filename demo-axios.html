@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>Demo axios</title>
+</head>
+<body>
+    <div id="app">
+        <table v-for="rest in rests">
+            <tr>
+                <td>{{rest.name}}</td>
+                <td>{{rest.city}} - {{rest.nbcouverts}} - {{rest.terrasse}} - {{rest.parking}} </td>
+                <td><a style="color:red;font-size:25px;">X</a></td>
+            </tr>
+            <tr>
+                <td>Equipe</td>
+                <td v-for="emp in employes" v-if="rest.id == emp.restaurants_id">{{emp.firstname}} {{emp.lastname}} <a v-on:click="mydelete(rest.id, emp.id)" style="color:red;font-size:25px;">X</a></td>
+            </tr>
+        </table>
+    </div>
+    <script>
+        let app = new Vue({
+            el:"#app",
+            data: {
+                rests: null,
+                employes: null
+            },
+            methods:{
+                mydelete: (restId, empId) => {
+                    console.log(restId + empId);
+                        //axios
+                        //.delete("http://127.0.0.1:5000/restaurant") 
+                }
+            },
+            mounted () {
+                    axios
+                    .get("http://127.0.0.1:5000/restaurant")
+                    .then(res => {
+                        this.rests = res.data
+                        this.employes = [];
+                        for (let i=0;i<this.rests.length;i++)
+                        {
+                            var restId = this.rests[i].id;
+                            axios
+                            .get("http://127.0.0.1:5000/restaurant/"+restId+"/employes")
+                            .then(resp => {
+                                this.employes.push(resp.data);
+                                console.log(this.employes);
+                            })
+                            
+                        }
+                    });
+                    //.catch(error => this.posts = [{"name":"Erreur de chargement"}])
+            },
+        });
+    </script>
+</body>
+</html>
