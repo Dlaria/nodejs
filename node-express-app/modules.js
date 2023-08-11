@@ -171,6 +171,8 @@ var routingParams = () => {
     // DELETE Restaurant
     app.delete('/restaurant/:id', (req, res) =>
     {
+        res.header("Access-Control-Allow-Origin", "*");
+        
         var id = parseInt(req.params.id);
 
         var sql1_template = 'SELECT * FROM ?? WHERE ?? = ' + id,
@@ -336,6 +338,8 @@ var routingParams = () => {
     // DELETE Employes
     app.delete('/restaurant/:restid/employes/:empid', (req, res) =>
     {
+        res.header("Access-Control-Allow-Origin", "*");
+
         var restId = parseInt(req.params.restid),
         empId = parseInt(req.params.empid),
         sql_template = 'DELETE FROM ?? WHERE ?? = ' + empId + ' AND ?? = ' + restId,
