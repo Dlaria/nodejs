@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,38 +8,63 @@
     <title>Demo axios</title>
 </head>
 <body>
-    <div id="app">
-        <table v-for="rest in rests">
-            <tr>
-                <td>{{rest.name}}</td>
-                <td>{{rest.city}} - {{rest.nbcouverts}} - {{rest.terrasse}} - {{rest.parking}} </td>
-                <td><a style="color:red;font-size:25px;">X</a></td>
-            </tr>
-            <tr>
-                <td>Equipe</td>
-                <td v-for="emp in employes" v-if="rest.id == emp.restaurants_id">{{emp.firstname}} {{emp.lastname}} <a v-on:click="mydelete(rest.id, emp.id)" style="color:red;font-size:25px;">X</a></td>
-            </tr>
-        </table>
-    </div>
-    <script>
-        let app = new Vue({
-            el:"#app",
-            data: {
-                rests: null,
-                employes: null
-            },
-            methods:{
-                mydelete: (restId, empId) => {
-                    console.log(restId + empId);
-                        //axios
-                        //.delete("http://127.0.0.1:5000/restaurant") 
+<div id="app">
+    <table v-for="rest in rests">
+        <tr>
+            <td>{{rest.name}}</td>
+            <td>{{rest.city}} - {{rest.nbcouverts}} - {{rest.terrasse}} - {{rest.parking}} </td>
+            <td><a v-on:click="mydelete(rest.id)" style="color:red;font-size:25px;">X</a></td>
+        </tr>
+        <tr>
+            <td style="width:100px;">Equipe</td>
+            <td v-for="emp in employes" v-if="rest.id == emp.restaurants_id">
+                {{ emp.firstname }} {{ emp.lastname }}
+                <a v-on:click="mydelete(rest.id, emp.id)" style="color:red;font-size:25px;">X</a>
+            </td>
+        </tr>
+    </table>
+</div>
+<script>
+    let app = new Vue({
+        el:"#app",
+        data: {
+            rests: [],
+            employes: [],
+        },
+        methods: {
+            mydelete(restId, empId = null) {
+                if (empId === null) {
+                    axios({
+                        method: 'DELETE',
+                        url: "http://127.0.0.1:5000/restaurant/" + restId,
+                        headers: {
+                            'Access-Control-Allow-Origin': 'http://127.0.0.1'
+                        }
+                        }).then(response => {
+                            alert("Le restaurant à l'id " + restId + " a bien été supprimé");
+                            this.refreshData();
+                        }).catch(error => {
+                        console.log(error);
+                    });
+                } else {
+                    axios({
+                        method: 'DELETE',
+                        url: "http://127.0.0.1:5000/restaurant/" + restId + "/employes/" + empId,
+                        headers: {
+                            'Access-Control-Allow-Origin': 'http://127.0.0.1'
+                        }
+                        }).then(response => {
+                            alert("L'employé du restaurant " + restId + " et à l'id " + empId + " a bien été supprimé");
+                            this.refreshData();
+                        }).catch(error => {
+                        console.log(error);
+                    });
                 }
             },
-            mounted () {
-                    axios
-                    .get("http://127.0.0.1:5000/restaurant")
+            refreshData() {
+                axios.get("http://127.0.0.1:5000/restaurant")
                     .then(res => {
-                        this.rests = res.data
+                        this.rests = res.data;
                         this.employes = [];
                         for (let i=0;i<this.rests.length;i++)
                         {
@@ -48,14 +73,19 @@
                             .get("http://127.0.0.1:5000/restaurant/"+restId+"/employes")
                             .then(resp => {
                                 this.employes.push(resp.data);
-                                console.log(this.employes);
                             })
                             
                         }
+                    })
+                    .catch(error => {
+                        console.log(error);
                     });
-                    //.catch(error => this.posts = [{"name":"Erreur de chargement"}])
             },
-        });
-    </script>
+        },
+        mounted() {
+            this.refreshData();
+        },
+    });
+</script>
 </body>
 </html>
