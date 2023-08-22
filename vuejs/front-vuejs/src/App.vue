@@ -47,9 +47,10 @@
         <input type="text" name="lastname" id="lastname" v-model="form_emp.lastname">
       </div>
       <div class="hire_date">
-        <label for="hire_date"></label>
+        <label for="hire_date">Date d'embauche </label>
         <input type="date" name="hire_date" id="hire_date" v-model="form_emp.hire_date">
       </div>
+      <label for="rest_id">Restaurant assigné </label>
       <select name="rest_id" id="rest_id" v-model="form_emp.rest_id">
         <option v-for="rest in rests" :key="rest.id" :value="rest.id">{{ rest.name }}</option>
       </select>
@@ -123,6 +124,29 @@ export default {
                   .catch((error) => {
                     console.log(error);
                   })
+          },
+          mydelete(restId, empId = null) {
+            if (empId === null) {
+                axios({
+                    method: 'DELETE',
+                    url: "http://127.0.0.1:5000/restaurant/" + restId
+                    }).then((response) => {
+                        alert("Le restaurant à l'id " + restId + " a bien été supprimé");
+                        console.log(response);
+                    }).catch(error => {
+                    console.log(error);
+                });
+            } else {
+                axios({
+                    method: 'DELETE',
+                    url: "http://127.0.0.1:5000/restaurant/" + restId + "/employes/" + empId
+                    }).then((response) => {
+                        alert("L'employé du restaurant " + restId + " et à l'id " + empId + " a bien été supprimé");
+                        console.log(response);
+                    }).catch(error => {
+                    console.log(error);
+                });
+            }
           }
         },
         mounted() {
