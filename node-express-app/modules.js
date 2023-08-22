@@ -251,7 +251,7 @@ var routingParams = () => {
                 let sql = 'INSERT INTO employes (firstname, lastname, hire_date, restaurants_id)' +
                 'VALUES ("' + req.body.firstname +'", "'
                             + req.body.lastname +'", STR_TO_DATE("'
-                            + req.body.hire_date +'", "%d/%m/%Y"), "'
+                            + req.body.hire_date +'", "%Y-%m-%d"), "'
                             + id +'")';
 
                 connection().query(sql, (err, results) => 

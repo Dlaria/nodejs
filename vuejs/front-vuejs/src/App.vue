@@ -3,29 +3,29 @@
 
     <!-- Formulaire d'ajout de restaurant -->
     <h1>Ajout de restaurant</h1>
-    <form method="post">
+    <form v-on:submit.prevent="submit_rest()">
       <div class="rest_name">
-        <label for="rest_name">Nom du restaurant </label>
-        <input type="text" name="rest_name" id="rest_name">
+        <label for="name">Nom du restaurant </label>
+        <input type="text" name="name" id="rest_name" v-model="form_rest.name">
       </div>
       <div class="city">
         <label for="city">La ville </label>
-        <input type="text" name="city" id="city">
+        <input type="text" name="city" id="city" v-model="form_rest.city">
       </div>
       <div class="nbcouverts">
-        <label for="nbcouvert">Nombre de couvert </label>
-        <input type="number" name="nbcouverts" id="nbcouverts">
+        <label for="nbcouverts">Nombre de couvert </label>
+        <input type="number" name="nbcouverts" id="nbcouverts" v-model="form_rest.nbcouverts">
       </div>
       <div class="terrasse">
         <label for="terrasse">Terrasse </label>
-        <select name="terrasse" id="terrasse">
+        <select name="terrasse" id="terrasse" v-model="form_rest.terrasse">
           <option value="oui">oui</option>
           <option value="non">non</option>
         </select>
       </div>
       <div class="parking">
         <label for="parking">Parking </label>
-        <select name="parking" id="parking">
+        <select name="parking" id="parking" v-model="form_rest.parking">
           <option value="oui">oui</option>
           <option value="non">non</option>
         </select>
@@ -37,10 +37,25 @@
 
     <!-- Formulaire d'ajout d'employer -->
     <h1>Ajout d'un employer</h1>
-    <form method="post">
-      <select name="" id="">
-        <customSelect v-for="rest in rests" :key="rest.id" v-model="rest.name" />
+    <form v-on:submit.prevent="submit_emp()">
+      <div class="emp_firstname">
+        <label for="firstname">Prénom </label>
+        <input type="text" name="firstname" id="firstname" v-model="form_emp.firstname">
+      </div>
+      <div class="emp_lastname">
+        <label for="lastname">Nom </label>
+        <input type="text" name="lastname" id="lastname" v-model="form_emp.lastname">
+      </div>
+      <div class="hire_date">
+        <label for="hire_date"></label>
+        <input type="date" name="hire_date" id="hire_date" v-model="form_emp.hire_date">
+      </div>
+      <select name="rest_id" id="rest_id" v-model="form_emp.rest_id">
+        <option v-for="rest in rests" :key="rest.id" :value="rest.id">{{ rest.name }}</option>
       </select>
+      <div class="buttonSubmit">
+        <button id="submit_rest" type="submit">Ajouter</button>
+      </div>
     </form>
 
     <!-- Tableau d'affichage des restaurants et des employés -->
@@ -70,18 +85,46 @@
 
 <script>
 import axios from 'axios'
-import customSelect from './components/CustomSelect.vue'
-//eslint-disable-next-line
-import { ref } from 'vue'
 
 export default {
   name: 'MyAcceuil',
-  components: { customSelect },
   data() {return{
             rests: [],
-            employes: []
+            employes: [],
+            form_rest: {
+              name: '',
+              city: '',
+              nbcouverts: '',
+              terrasse: '',
+              parking: ''
+            },
+            form_emp:{
+              firstname: '',
+              lastname: '',
+              hire_date: '',
+              rest_id: ''
+            }
         }},
-
+        methods: {
+          submit_rest () {
+            axios.post('http://127.0.0.1:5000/restaurant', this.form_rest)
+                  .then((res) => {
+                    console.log(res);
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                  })
+          },
+          submit_emp () {
+            axios.post('http://127.0.0.1:5000/restaurant/'+ this.form_emp.rest_id + '/employes', this.form_emp)
+                  .then((res) => {
+                    console.log(res);
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                  })
+          }
+        },
         mounted() {
           axios.get("http://127.0.0.1:5000/restaurant")
                 .then(res => {
@@ -100,7 +143,7 @@ export default {
                 })
                 .catch(error => {
                     console.log(error);
-                });
+                });     
         },
 }
 </script>
