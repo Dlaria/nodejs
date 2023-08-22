@@ -53,7 +53,7 @@ var routingParams = () => {
 
     // Autoriser les requêtes DELETE depuis l'origine de l'application Vue.js
     app.use(cors({
-    origin: 'http://127.0.0.1', // Remplacez par l'URL de votre application Vue.js
+    origin: 'http://localhost:8080', // Remplacez par l'URL de votre application Vue.js
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     }));
     
