@@ -93,6 +93,7 @@ export default {
   data() {return{
             rests: [],
             employes: [],
+
             form_rest: {
               name: '',
               city: '',
@@ -100,6 +101,7 @@ export default {
               terrasse: '',
               parking: ''
             },
+
             form_emp:{
               firstname: '',
               lastname: '',
@@ -108,35 +110,57 @@ export default {
             }
         }},
         methods: {
+          // Fonction de vérification des chaînes de caractère des formulaires
           verif (obj) {
             let result = [],
             regex = /([A-Za-z- éèç]{3,20})/;
 
           for (let i in obj) {
+
             if (i !== 'nbcouverts' && i !== 'hire_date' && i !== 'rest_id'){
+
               result.push(`${obj[i]}`)
             }
           }
           // console.log(result);
           let m;
           for(let j=0;j<result.length;j++){
+
             m = regex.exec(result[j]);
-            console.log(result[j]);
-            console.log(m[0]);
+
             if (m !== null && result[j] === m[0]){
+
               m.forEach((match, groupIndex) => {
                 console.log(`Found match, group ${groupIndex}: ${match}`);
               })
-            }
-            else{
+            }else{
               return false;
             }
           }
+          },
+          valid_data (obj) {
+            let data = '';
+            for (let i in obj) {
 
+              // console.log(obj[i]);
+              data = obj[i].toString();
+              data = data.trim();
+              let map = {
+                '&' : '&amp;',
+                '<' : '&lt;',
+                '>' : '&gt;',
+                '"' : '&quot;',
+                "'" : '&#039;',
+              };
+              data = data.replace(/[&<>"']/g, function (m) { return map[m]; });
+              obj[i] = data;
+              // console.log(obj[i]);
+            }
+            return obj;
           },
           submit_rest () {
             if (this.verif(this.form_rest) !== false){
-              // console.log('post');
+              this.valid_data(this.form_rest);
               axios.post('http://127.0.0.1:5000/restaurant', this.form_rest)
                     .then((res) => {
                       console.log(res);
@@ -148,7 +172,7 @@ export default {
           },
           submit_emp () {
             if (this.verif(this.form_emp) !== false){
-              // console.log('post');
+
               axios.post('http://127.0.0.1:5000/restaurant/'+ this.form_emp.rest_id + '/employes', this.form_emp)
                     .then((res) => {
                       console.log(res);
@@ -194,7 +218,6 @@ export default {
                         .then(resp => {
                           for (let j=0;j<resp.data.length;j++){
                             this.employes.push(resp.data[j]);
-                            console.log(resp.data[j]);
                           }
                             // console.log(this.employes);  
                         })
@@ -207,7 +230,3 @@ export default {
         },
 }
 </script>
-
-<style>
-
-</style>
