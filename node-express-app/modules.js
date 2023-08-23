@@ -51,9 +51,8 @@ var routingParams = () => {
     const cors = require('cors');
 
 
-    // Autoriser les requêtes DELETE depuis l'origine de l'application Vue.js
     app.use(cors({
-    origin: 'http://localhost:8080', // Remplacez par l'URL de votre application Vue.js
+    origin: 'http://localhost:8080', // URL de l'application Vue.js
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     }));
     
@@ -80,8 +79,6 @@ var routingParams = () => {
      */
     app.post('/restaurant', (req, res) =>
     {
-        res.header("Access-Control-Allow-Origin", "*");
-
         let sql = 'INSERT INTO restaurant (name, city, nbcouverts, terrasse, parking)' +
         'VALUES ("' + req.body.name +'", "'
                     + req.body.city +'", "'
@@ -109,14 +106,12 @@ var routingParams = () => {
             if (err) throw err;
             res.send(rows);
         });
-        res.header("Access-Control-Allow-Origin", "*");
         res.status(200);
     });
 
     // GET id Restaurant
     app.get('/restaurant/:id', (req, res) =>
     {
-        res.header("Access-Control-Allow-Origin", "*");
 
         var id = parseInt(req.params.id),
         sql_template = 'SELECT * FROM ?? WHERE ?? = ' + id,
@@ -135,7 +130,6 @@ var routingParams = () => {
     // PUT id Restaurant
     app.put('/restaurant/:id', (req, res) =>
     {
-        res.header("Access-Control-Allow-Origin", "*");
 
         let name = '',
         city = '',
@@ -219,7 +213,6 @@ var routingParams = () => {
             if (err) throw err;
             console.log("Delete in Restaurant in id :" + id);
         });
-        res.header("Access-Control-Allow-Origin", "*");
         res.status(200);
     });
 
@@ -234,7 +227,6 @@ var routingParams = () => {
      */
     app.post('/restaurant/:restid/employes', (req, res) => 
     {
-        res.header("Access-Control-Allow-Origin", "*");
 
         var id = parseInt(req.params.restid);
 
@@ -276,19 +268,19 @@ var routingParams = () => {
         connection().query(sql, (err, rows) => 
         {
             if (err) throw err;
+            emps = [];
             for(let i=0;i<rows.length;i++)
             {
-                res.send(rows[i]);
+                emps.push(rows[i]);
             }
+            res.send(emps);
         });
-        res.header("Access-Control-Allow-Origin", "*");
         res.status(200);
     });
 
     // GET Employes
     app.get('/restaurant/:restid/employes/:empid', (req, res) => 
     {
-        res.header("Access-Control-Allow-Origin", "*");
 
         var restId = parseInt(req.params.restid),
         empId = parseInt(req.params.empid);
@@ -308,7 +300,6 @@ var routingParams = () => {
     // PUT Employes
     app.put('/restaurant/:restid/employes/:empid', (req, res) =>
     {
-        res.header("Access-Control-Allow-Origin", "*");
 
         var restId = parseInt(req.params.restid),
         empId = parseInt(req.params.empid),
@@ -370,7 +361,6 @@ var routingParams = () => {
             if (err) throw err;
             console.log("Delete in Employes in id :" + empId);
         });
-        res.header("Access-Control-Allow-Origin", "*");
         res.status(200);
     });
 });
