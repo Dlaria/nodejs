@@ -75,8 +75,8 @@
 
           <!-- Employers -->
             <td style="width:100px;">Equipe</td>
-            <td v-for="emp in employes" :key="emp.restaurants_id">
-                <div v-if="rest.id == emp.restaurants_id"><p>{{ emp.firstname }} {{ emp.lastname }}
+            <td>
+                <div v-for="emp in employes" :key="emp.restaurants_id"><p v-if="rest.id == emp.restaurants_id">{{ emp.firstname }} {{ emp.lastname }}
                 <a v-on:click="mydelete(rest.id, emp.id)" style="color:red;font-size:25px;">X</a></p></div>
             </td>
         </tr>
