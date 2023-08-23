@@ -6,32 +6,33 @@
     <form v-on:submit.prevent="submit_rest()">
       <div class="rest_name">
         <label for="name">Nom du restaurant </label>
-        <input type="text" name="name" id="rest_name" v-model="form_rest.name">
+        <!--  pattern="([A-Za-z éèç]{3,20})" === /([A-Za-z éèç]{3,20})/v dans vue -->
+        <input type="text" name="name" id="rest_name" minlength="3" maxlength="20" v-model="form_rest.name" required>
       </div>
       <div class="city">
         <label for="city">La ville </label>
-        <input type="text" name="city" id="city" v-model="form_rest.city">
+        <input type="text" name="city" id="city" minlength="3" maxlength="20" v-model="form_rest.city" required>
       </div>
       <div class="nbcouverts">
         <label for="nbcouverts">Nombre de couvert </label>
-        <input type="number" name="nbcouverts" id="nbcouverts" v-model="form_rest.nbcouverts">
+        <input type="number" name="nbcouverts" id="nbcouverts" v-model="form_rest.nbcouverts" minlength="2" required>
       </div>
       <div class="terrasse">
         <label for="terrasse">Terrasse </label>
-        <select name="terrasse" id="terrasse" v-model="form_rest.terrasse">
+        <select name="terrasse" id="terrasse" v-model="form_rest.terrasse" required>
           <option value="oui">oui</option>
           <option value="non">non</option>
         </select>
       </div>
       <div class="parking">
         <label for="parking">Parking </label>
-        <select name="parking" id="parking" v-model="form_rest.parking">
+        <select name="parking" id="parking" v-model="form_rest.parking" required>
           <option value="oui">oui</option>
           <option value="non">non</option>
         </select>
       </div>
       <div class="buttonSubmit">
-        <button id="submit_rest" type="submit">Ajouter</button>
+        <input id="submit_rest" type="submit" value="Ajouter">
       </div>
     </form>
 
@@ -40,22 +41,22 @@
     <form v-on:submit.prevent="submit_emp()">
       <div class="emp_firstname">
         <label for="firstname">Prénom </label>
-        <input type="text" name="firstname" id="firstname" v-model="form_emp.firstname">
+        <input type="text" name="firstname" id="firstname" minlength="3" maxlength="20" v-model="form_emp.firstname" required>
       </div>
       <div class="emp_lastname">
         <label for="lastname">Nom </label>
-        <input type="text" name="lastname" id="lastname" v-model="form_emp.lastname">
+        <input type="text" name="lastname" id="lastname" minlength="3" maxlength="20" v-model="form_emp.lastname" required>
       </div>
       <div class="hire_date">
         <label for="hire_date">Date d'embauche </label>
-        <input type="date" name="hire_date" id="hire_date" v-model="form_emp.hire_date">
+        <input type="date" name="hire_date" id="hire_date" v-model="form_emp.hire_date" required>
       </div>
       <label for="rest_id">Restaurant assigné </label>
-      <select name="rest_id" id="rest_id" v-model="form_emp.rest_id">
+      <select name="rest_id" id="rest_id" v-model="form_emp.rest_id" required>
         <option v-for="rest in rests" :key="rest.id" :value="rest.id">{{ rest.name }}</option>
       </select>
       <div class="buttonSubmit">
-        <button id="submit_rest" type="submit">Ajouter</button>
+        <input id="submit_emp" type="submit" value="Ajouter">
       </div>
     </form>
 
@@ -75,8 +76,8 @@
           <!-- Employers -->
             <td style="width:100px;">Equipe</td>
             <td v-for="emp in employes" :key="emp.restaurants_id">
-                <p v-if="rest.id == emp.restaurants_id">{{ emp.firstname }} {{ emp.lastname }}
-                <a v-on:click="mydelete(rest.id, emp.id)" style="color:red;font-size:25px;">X</a></p>
+                <div v-if="rest.id == emp.restaurants_id"><p>{{ emp.firstname }} {{ emp.lastname }}
+                <a v-on:click="mydelete(rest.id, emp.id)" style="color:red;font-size:25px;">X</a></p></div>
             </td>
         </tr>
     </table>
@@ -107,23 +108,55 @@ export default {
             }
         }},
         methods: {
+          verif (obj) {
+            let result = [],
+            regex = /([A-Za-z- éèç]{3,20})/;
+
+          for (let i in obj) {
+            if (i !== 'nbcouverts' && i !== 'hire_date' && i !== 'rest_id'){
+              result.push(`${obj[i]}`)
+            }
+          }
+          // console.log(result);
+          let m;
+          for(let j=0;j<result.length;j++){
+            m = regex.exec(result[j]);
+            console.log(result[j]);
+            console.log(m[0]);
+            if (m !== null && result[j] === m[0]){
+              m.forEach((match, groupIndex) => {
+                console.log(`Found match, group ${groupIndex}: ${match}`);
+              })
+            }
+            else{
+              return false;
+            }
+          }
+
+          },
           submit_rest () {
-            axios.post('http://127.0.0.1:5000/restaurant', this.form_rest)
-                  .then((res) => {
-                    console.log(res);
-                  })
-                  .catch((error) => {
-                    console.log(error);
-                  })
+            if (this.verif(this.form_rest) !== false){
+              // console.log('post');
+              axios.post('http://127.0.0.1:5000/restaurant', this.form_rest)
+                    .then((res) => {
+                      console.log(res);
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                    })
+              }
           },
           submit_emp () {
-            axios.post('http://127.0.0.1:5000/restaurant/'+ this.form_emp.rest_id + '/employes', this.form_emp)
-                  .then((res) => {
-                    console.log(res);
-                  })
-                  .catch((error) => {
-                    console.log(error);
-                  })
+            if (this.verif(this.form_emp) !== false){
+              // console.log('post');
+              axios.post('http://127.0.0.1:5000/restaurant/'+ this.form_emp.rest_id + '/employes', this.form_emp)
+                    .then((res) => {
+                      console.log(res);
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                    })
+            }
           },
           mydelete(restId, empId = null) {
             if (empId === null) {
@@ -153,21 +186,24 @@ export default {
           axios.get("http://127.0.0.1:5000/restaurant")
                 .then(res => {
                   this.rests = res.data;
-                  this.employes = [];
                   for (let i=0;i<this.rests.length;i++)
                   {
                         var restId = this.rests[i].id;
                         axios
                         .get("http://127.0.0.1:5000/restaurant/"+restId+"/employes")
                         .then(resp => {
-                            this.employes.push(resp.data);
+                          for (let j=0;j<resp.data.length;j++){
+                            this.employes.push(resp.data[j]);
+                            console.log(resp.data[j]);
+                          }
+                            // console.log(this.employes);  
                         })
                         
                     }
                 })
                 .catch(error => {
                     console.log(error);
-                });     
+                });   
         },
 }
 </script>
